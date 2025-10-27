@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
+import apiService from "../services/api";
 
 // Bulk Inventory & Pricing Admin — Nova Products + Inventory schemas
 // Tailwind-only, previewable UI. Wire endpoints to your API. – Big Buddy edition
@@ -206,7 +207,7 @@ function computeDiff(rows, schemaKey) {
 // ------------------------------
 // Main Component
 // ------------------------------
-export default function BulkInventoryAndPricingTool() {
+export default function BulkInventoryAndPricingTool({ onLogout }) {
   const [activeTab, setActiveTab] = useState("upload");
   const [schemaKey, setSchemaKey] = useState("products"); // default to Products
   const [rows, setRows] = useState([]);
@@ -217,6 +218,7 @@ export default function BulkInventoryAndPricingTool() {
   const [applyResult, setApplyResult] = useState(null);
   const [employeeId, setEmployeeId] = useState("");
   const [reason, setReason] = useState(INVENTORY_DEFAULT_COMMENT);
+  const [isApplying, setIsApplying] = useState(false);
   const fileRef = useRef(null);
 
   const severityCounts = useMemo(() => ({
@@ -260,21 +262,58 @@ export default function BulkInventoryAndPricingTool() {
     setDiffs(computeDiff(next, schemaKey));
   }
 
-  function applyChanges() {
-    const id = Math.random().toString(36).slice(2, 8).toUpperCase();
-    setApplyResult({
-      batchId: id,
-      schema: schemaKey,
-      dryRun: opts.dryRun,
-      transactional: opts.transactional,
-      upsert: opts.upsert,
-      created: rows.length,
-      updated: diffs.reduce((a, d) => a + (d.changes.length ? 1 : 0), 0),
-      skipped: severityCounts.err > 0 ? severityCounts.err : 0,
-      employeeId: schemaKey === 'inventory' ? employeeId : undefined,
-      reason: schemaKey === 'inventory' ? reason : undefined,
-    });
-    setActiveTab("review");
+  async function applyChanges() {
+    setIsApplying(true);
+    try {
+      // Call the appropriate API endpoint based on schema
+      const apiOptions = {
+        upsert: opts.upsert,
+        transactional: opts.transactional,
+        dryRun: opts.dryRun,
+        batchName: batchName || `${schemaKey === 'products' ? 'Products' : 'Inventory'}-${new Date().toISOString().split('T')[0]}`,
+        ...(schemaKey === 'inventory' && {
+          employeeId: employeeId || null,
+          reason: reason || INVENTORY_DEFAULT_COMMENT
+        })
+      };
+
+      let result;
+      if (schemaKey === 'products') {
+        result = await apiService.bulkUpdateProducts(rows, apiOptions);
+      } else {
+        result = await apiService.bulkUpdateInventory(rows, apiOptions);
+      }
+
+      // Display the result from the API
+      setApplyResult({
+        batchId: result.batchId || 'N/A',
+        schema: schemaKey,
+        dryRun: opts.dryRun,
+        transactional: opts.transactional,
+        upsert: opts.upsert,
+        created: result.created || 0,
+        updated: result.updated || diffs.reduce((a, d) => a + (d.changes.length ? 1 : 0), 0),
+        skipped: result.skipped || 0,
+        employeeId: schemaKey === 'inventory' ? employeeId : undefined,
+        reason: schemaKey === 'inventory' ? reason : undefined,
+        message: result.message || 'Changes applied successfully'
+      });
+      
+      // If not dry run and successful, could clear the form
+      if (!opts.dryRun && result.success) {
+        // Optionally reset or keep for review
+      }
+    } catch (error) {
+      console.error('Apply changes failed:', error);
+      setApplyResult({
+        error: true,
+        message: error.message || 'Failed to apply changes. Please try again.',
+        schema: schemaKey,
+        dryRun: opts.dryRun
+      });
+    } finally {
+      setIsApplying(false);
+    }
   }
 
   const schema = SCHEMAS[schemaKey];
@@ -282,9 +321,16 @@ export default function BulkInventoryAndPricingTool() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Bulk Inventory & Pricing Admin</h1>
-          <p className="text-gray-600 mt-1">Upload a CSV/XLSX, validate, preview diffs, and apply changes to <strong>{schemaKey === 'products' ? 'Products' : 'Inventory'}</strong> with audit logging & rollback.</p>
+        <header className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Bulk Inventory & Pricing Admin</h1>
+            <p className="text-gray-600 mt-1">Upload a CSV/XLSX, validate, preview diffs, and apply changes to <strong>{schemaKey === 'products' ? 'Products' : 'Inventory'}</strong> with audit logging & rollback.</p>
+          </div>
+          {onLogout && (
+            <Button variant="outline" onClick={onLogout}>
+              Logout
+            </Button>
+          )}
         </header>
 
         {/* Tabs */}
@@ -442,8 +488,10 @@ export default function BulkInventoryAndPricingTool() {
                 )}
 
                 <div className="pt-4 flex gap-2">
-                  <Button variant="primary" onClick={applyChanges} disabled={rows.length===0 || severityCounts.err>0}>Apply changes</Button>
-                  <Button variant="outline" onClick={()=>setActiveTab("grid")}>Back</Button>
+                  <Button variant="primary" onClick={applyChanges} disabled={rows.length===0 || severityCounts.err>0 || isApplying}>
+                    {isApplying ? "Applying..." : "Apply changes"}
+                  </Button>
+                  <Button variant="outline" onClick={()=>setActiveTab("grid")} disabled={isApplying}>Back</Button>
                 </div>
                 {severityCounts.err>0 && <p className="text-xs text-red-600 pt-2">Resolve errors before applying.</p>}
               </div>
@@ -473,19 +521,38 @@ export default function BulkInventoryAndPricingTool() {
             </Card>
 
             {applyResult && (
-              <Card title="Apply result" className="lg:col-span-3">
-                <div className="text-sm grid sm:grid-cols-3 gap-2">
-                  <div><span className="text-gray-500">Batch ID</span><div className="font-semibold">{applyResult.batchId}</div></div>
-                  <div><span className="text-gray-500">Scope</span><div className="font-semibold">{applyResult.schema === 'products' ? 'Products' : 'Inventory'}</div></div>
-                  <div><span className="text-gray-500">Options</span><div className="font-semibold">{applyResult.dryRun?"Dry run":"Live"} • {applyResult.transactional?"Transactional":"Per-row"} • {applyResult.upsert?"Upsert":"Update-only"}</div></div>
-                  <div><span className="text-gray-500">Summary</span><div className="font-semibold">{applyResult.updated} updated • {applyResult.created} rows processed • {applyResult.skipped} skipped</div></div>
-                  {applyResult.schema === 'inventory' && (
-                    <div className="sm:col-span-3 text-xs text-gray-600">
-                      <div>EmployeeID for audit: <span className="font-semibold">{applyResult.employeeId || '—'}</span></div>
-                      <div>Comment for audit: <span className="font-semibold">{applyResult.reason || INVENTORY_DEFAULT_COMMENT}</span></div>
+              <Card title={applyResult.error ? "Error" : "Apply result"} className="lg:col-span-3">
+                {applyResult.error ? (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div className="flex items-start gap-2">
+                      <span className="text-red-600 text-sm font-semibold">❌</span>
+                      <div>
+                        <p className="text-sm text-red-800 font-semibold">Failed to apply changes</p>
+                        <p className="text-sm text-red-700 mt-1">{applyResult.message}</p>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div>
+                    {applyResult.message && (
+                      <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-3 text-sm text-green-800">
+                        ✓ {applyResult.message}
+                      </div>
+                    )}
+                    <div className="text-sm grid sm:grid-cols-3 gap-2">
+                      <div><span className="text-gray-500">Batch ID</span><div className="font-semibold">{applyResult.batchId}</div></div>
+                      <div><span className="text-gray-500">Scope</span><div className="font-semibold">{applyResult.schema === 'products' ? 'Products' : 'Inventory'}</div></div>
+                      <div><span className="text-gray-500">Options</span><div className="font-semibold">{applyResult.dryRun?"Dry run":"Live"} • {applyResult.transactional?"Transactional":"Per-row"} • {applyResult.upsert?"Upsert":"Update-only"}</div></div>
+                      <div><span className="text-gray-500">Summary</span><div className="font-semibold">{applyResult.updated} updated • {applyResult.created} rows processed • {applyResult.skipped} skipped</div></div>
+                      {applyResult.schema === 'inventory' && (
+                        <div className="sm:col-span-3 text-xs text-gray-600">
+                          <div>EmployeeID for audit: <span className="font-semibold">{applyResult.employeeId || '—'}</span></div>
+                          <div>Comment for audit: <span className="font-semibold">{applyResult.reason || INVENTORY_DEFAULT_COMMENT}</span></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </Card>
             )}
           </div>
