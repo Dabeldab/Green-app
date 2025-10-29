@@ -39,10 +39,10 @@ export default function App() {
 
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-black"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+      <div className="nova-bg-gradient min-h-screen flex items-center justify-center">
+        <div className="text-center nova-fade-in">
+          <div className="nova-spinner w-12 h-12 inline-block mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading Nova POS...</p>
         </div>
       </div>
     );

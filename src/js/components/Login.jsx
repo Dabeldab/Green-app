@@ -28,17 +28,31 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Database Authentication</h1>
-            <p className="text-gray-600 mt-2">Enter your account credentials to access the inventory system</p>
+    <div className="nova-bg-gradient min-h-screen flex items-center justify-center p-4">
+      <div className="max-w-md w-full nova-fade-in">
+        {/* Nova Logo/Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4" style={{
+            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%)',
+            boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)'
+          }}>
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Nova POS</h1>
+          <p className="text-gray-600">Inventory Management System</p>
+        </div>
+
+        <div className="nova-card p-8">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-1">Welcome Back</h2>
+            <p className="text-sm text-gray-600">Sign in to access your inventory system</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="accountName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="accountName" className="block text-sm font-semibold text-gray-700 mb-2">
                 Account Name
               </label>
               <input
@@ -46,14 +60,14 @@ export default function Login({ onLoginSuccess }) {
                 type="text"
                 value={accountName}
                 onChange={(e) => setAccountName(e.target.value)}
-                placeholder="Enter account name"
+                placeholder="Enter your account name"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
+                className="nova-input"
               />
             </div>
 
             <div>
-              <label htmlFor="accountKey" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="accountKey" className="block text-sm font-semibold text-gray-700 mb-2">
                 Account Key
               </label>
               <input
@@ -61,32 +75,57 @@ export default function Login({ onLoginSuccess }) {
                 type="password"
                 value={accountKey}
                 onChange={(e) => setAccountKey(e.target.value)}
-                placeholder="Enter account key"
+                placeholder="Enter your account key"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
+                className="nova-input"
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-800">
-                {error}
+              <div className="nova-alert nova-alert-error">
+                <div className="flex items-start gap-2">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-medium">{error}</span>
+                </div>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-black text-white py-2 px-4 rounded-xl font-medium hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="nova-btn nova-btn-primary w-full py-3 text-base font-semibold"
             >
-              {loading ? "Authenticating..." : "Login"}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="nova-spinner w-5 h-5"></div>
+                  Authenticating...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Sign In
+                </span>
+              )}
             </button>
           </form>
 
-          <div className="mt-6 text-xs text-gray-500 text-center">
-            <p>Your credentials are used to authenticate with the MSSQL database.</p>
-            <p className="mt-1">They are securely stored in your browser session.</p>
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>Secure connection to MSSQL database</span>
+            </div>
           </div>
         </div>
+
+        <p className="text-center text-xs text-gray-500 mt-4">
+          Your credentials are encrypted and stored securely in your browser session
+        </p>
       </div>
     </div>
   );

@@ -8,42 +8,42 @@ import apiService from "../services/api";
 // Helper UI bits
 // ------------------------------
 const Badge = ({ children, variant = "neutral" }) => {
-  const styles = {
-    neutral: "bg-gray-100 text-gray-700",
-    ok: "bg-green-100 text-green-800",
-    warn: "bg-yellow-100 text-yellow-800",
-    err: "bg-red-100 text-red-800",
-    info: "bg-blue-100 text-blue-800",
+  const variantClass = {
+    neutral: "nova-badge-neutral",
+    ok: "nova-badge-success",
+    warn: "nova-badge-warning",
+    err: "nova-badge-error",
+    info: "nova-badge-info",
   }[variant];
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles}`}>
+    <span className={`nova-badge ${variantClass}`}>
       {children}
     </span>
   );
 };
 
 const Card = ({ title, actions, children, className = "" }) => (
-  <div className={`rounded-2xl shadow-sm border border-gray-200 bg-white ${className}`}>
-    <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-100">
-      <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+  <div className={`nova-card ${className}`}>
+    <div className="nova-card-header">
+      <h3 className="text-base font-bold text-gray-900">{title}</h3>
       <div className="flex gap-2">{actions}</div>
     </div>
-    <div className="p-4 sm:p-6">{children}</div>
+    <div className="p-6">{children}</div>
   </div>
 );
 
 const Button = ({ children, onClick, variant = "primary", disabled }) => {
-  const style = {
-    primary: "bg-black text-white hover:bg-gray-900",
-    outline: "bg-white text-gray-900 border border-gray-300 hover:bg-gray-50",
-    ghost: "bg-transparent text-gray-700 hover:bg-gray-100",
-    danger: "bg-red-600 text-white hover:bg-red-700",
+  const variantClass = {
+    primary: "nova-btn-primary",
+    outline: "nova-btn-secondary",
+    ghost: "nova-btn-secondary border-0",
+    danger: "bg-gradient-to-br from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-lg shadow-red-500/30",
   }[variant];
   return (
     <button
       disabled={disabled}
       onClick={onClick}
-      className={`px-3.5 py-2 rounded-xl text-sm font-medium ${style} disabled:opacity-50 disabled:cursor-not-allowed`}
+      className={`nova-btn px-4 py-2 text-sm font-semibold ${variantClass} disabled:opacity-50 disabled:cursor-not-allowed`}
     >
       {children}
     </button>
@@ -51,14 +51,14 @@ const Button = ({ children, onClick, variant = "primary", disabled }) => {
 };
 
 const Toggle = ({ checked, onChange, label }) => (
-  <label className="flex items-center gap-2 text-sm">
+  <label className="flex items-center gap-3 text-sm cursor-pointer group">
     <input
       type="checkbox"
-      className="h-4 w-4 rounded border-gray-300"
+      className="nova-checkbox"
       checked={checked}
       onChange={(e) => onChange?.(e.target.checked)}
     />
-    <span className="text-gray-700">{label}</span>
+    <span className="text-gray-700 font-medium group-hover:text-gray-900">{label}</span>
   </label>
 );
 
@@ -66,7 +66,7 @@ const Select = ({ value, onChange, children }) => (
   <select
     value={value}
     onChange={(e) => onChange?.(e.target.value)}
-    className="rounded-xl border border-gray-300 px-3 py-2 text-sm bg-white"
+    className="nova-select text-sm font-medium"
   >
     {children}
   </select>
@@ -319,33 +319,59 @@ export default function BulkInventoryAndPricingTool({ onLogout }) {
   const schema = SCHEMAS[schemaKey];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+    <div className="nova-bg-gradient min-h-screen p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-6 flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Bulk Inventory & Pricing Admin</h1>
-            <p className="text-gray-600 mt-1">Upload a CSV/XLSX, validate, preview diffs, and apply changes to <strong>{schemaKey === 'products' ? 'Products' : 'Inventory'}</strong> with audit logging & rollback.</p>
+        {/* Nova Header with Gradient */}
+        <header className="mb-8 nova-fade-in">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+                }}>
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">Inventory & Pricing Admin</h1>
+                  <p className="text-sm text-gray-600 mt-0.5">Nova POS Management System</p>
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm max-w-2xl">
+                Upload CSV files, validate data, preview changes, and apply updates to <span className="font-semibold text-indigo-600">{schemaKey === 'products' ? 'Products' : 'Inventory'}</span> with complete audit logging.
+              </p>
+            </div>
+            {onLogout && (
+              <Button variant="outline" onClick={onLogout}>
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Logout
+                </span>
+              </Button>
+            )}
           </div>
-          {onLogout && (
-            <Button variant="outline" onClick={onLogout}>
-              Logout
-            </Button>
-          )}
         </header>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
           {[
-            { id: "upload", label: "1) Upload" },
-            { id: "grid", label: "2) Edit Grid" },
-            { id: "review", label: "3) Review & Apply" },
-            { id: "audit", label: "Audit Log" },
+            { id: "upload", label: "1) Upload", icon: "M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" },
+            { id: "grid", label: "2) Edit Grid", icon: "M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" },
+            { id: "review", label: "3) Review & Apply", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+            { id: "audit", label: "Audit Log", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
           ].map((t) => (
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`px-3 py-2 rounded-xl text-sm font-medium border ${activeTab === t.id ? "bg-black text-white border-black" : "bg-white text-gray-800 border-gray-200 hover:bg-gray-50"}`}
+              className={`nova-tab flex items-center gap-2 whitespace-nowrap ${activeTab === t.id ? "nova-tab-active" : "nova-tab-inactive"}`}
             >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={t.icon} />
+              </svg>
               {t.label}
             </button>
           ))}
@@ -383,8 +409,8 @@ export default function BulkInventoryAndPricingTool({ onLogout }) {
                 <Toggle checked={opts.transactional} onChange={(v) => setOpts({ ...opts, transactional: v })} label="Transactional (all-or-nothing)" />
                 <Toggle checked={opts.dryRun} onChange={(v) => setOpts({ ...opts, dryRun: v })} label="Dry run (simulate only)" />
                 <div className="pt-2">
-                  <label className="block text-xs text-gray-500 mb-1">Name this batch (for rollback/audit)</label>
-                  <input value={batchName} onChange={(e) => setBatchName(e.target.value)} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" placeholder="e.g. Oct22-Inventory-Recount" />
+                  <label className="block text-xs font-semibold text-gray-700 mb-2">Name this batch (for rollback/audit)</label>
+                  <input value={batchName} onChange={(e) => setBatchName(e.target.value)} className="nova-input text-sm" placeholder="e.g. Oct22-Inventory-Recount" />
                 </div>
               </div>
             </Card>
@@ -442,7 +468,7 @@ export default function BulkInventoryAndPricingTool({ onLogout }) {
                                 setIssues(validateRows(next, schemaKey));
                                 setDiffs(computeDiff(next, schemaKey));
                               }}
-                              className="w-full border border-gray-300 rounded-lg px-2 py-1"
+                              className="w-full border border-gray-300 rounded-lg px-2 py-1 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all"
                             />
                           </td>
                         ))}
@@ -469,20 +495,22 @@ export default function BulkInventoryAndPricingTool({ onLogout }) {
                   <Toggle checked={opts.dryRun} onChange={(v)=>setOpts({...opts, dryRun: v})} label="Dry run" />
                 </div>
                 <div className="pt-3">
-                  <label className="block text-xs text-gray-500 mb-1">Batch name</label>
-                  <input value={batchName} onChange={(e)=>setBatchName(e.target.value)} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" placeholder="e.g. Oct22-Inventory-Recount" />
+                  <label className="block text-xs font-semibold text-gray-700 mb-2">Batch name</label>
+                  <input value={batchName} onChange={(e)=>setBatchName(e.target.value)} className="nova-input text-sm" placeholder="e.g. Oct22-Inventory-Recount" />
                 </div>
 
                 {schemaKey === 'inventory' && (
                   <div className="pt-3 grid grid-cols-1 gap-3">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Employee ID (for Inventory_Transactions)</label>
-                      <input value={employeeId} onChange={(e)=>setEmployeeId(e.target.value)} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" placeholder="e.g. 43" />
+                      <label className="block text-xs font-semibold text-gray-700 mb-2">Employee ID (for Inventory_Transactions)</label>
+                      <input value={employeeId} onChange={(e)=>setEmployeeId(e.target.value)} className="nova-input text-sm" placeholder="e.g. 43" />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Reason / Comment</label>
-                      <textarea value={reason} onChange={(e)=>setReason(e.target.value)} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm" rows={2} placeholder={INVENTORY_DEFAULT_COMMENT} />
-                      <p className="text-[11px] text-gray-500 mt-1">Will populate <code>Inventory_Transactions.Comment</code>. Default mirrors your convention: “Current quantity was changed”.</p>
+                      <label className="block text-xs font-semibold text-gray-700 mb-2">Reason / Comment</label>
+                      <textarea value={reason} onChange={(e)=>setReason(e.target.value)} className="nova-input text-sm" rows={2} placeholder={INVENTORY_DEFAULT_COMMENT} />
+                      <p className="text-[11px] text-gray-600 mt-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+                        <span className="font-semibold text-blue-900">ℹ️ Note:</span> Will populate <code className="text-blue-800 font-mono text-[10px] bg-blue-100 px-1 py-0.5 rounded">Inventory_Transactions.Comment</code>. Default: "Current quantity was changed"
+                      </p>
                     </div>
                   </div>
                 )}
@@ -521,22 +549,29 @@ export default function BulkInventoryAndPricingTool({ onLogout }) {
             </Card>
 
             {applyResult && (
-              <Card title={applyResult.error ? "Error" : "Apply result"} className="lg:col-span-3">
+              <Card title={applyResult.error ? "❌ Error" : "✓ Apply Result"} className="lg:col-span-3">
                 {applyResult.error ? (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                    <div className="flex items-start gap-2">
-                      <span className="text-red-600 text-sm font-semibold">❌</span>
+                  <div className="nova-alert nova-alert-error">
+                    <div className="flex items-start gap-3">
+                      <svg className="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
                       <div>
-                        <p className="text-sm text-red-800 font-semibold">Failed to apply changes</p>
-                        <p className="text-sm text-red-700 mt-1">{applyResult.message}</p>
+                        <p className="font-bold mb-1">Failed to apply changes</p>
+                        <p className="text-sm">{applyResult.message}</p>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div>
                     {applyResult.message && (
-                      <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-3 text-sm text-green-800">
-                        ✓ {applyResult.message}
+                      <div className="nova-alert nova-alert-success mb-4">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span className="font-semibold">{applyResult.message}</span>
+                        </div>
                       </div>
                     )}
                     <div className="text-sm grid sm:grid-cols-3 gap-2">

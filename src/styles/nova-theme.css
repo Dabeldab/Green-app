@@ -1,0 +1,330 @@
+/* Nova POS Theme Styles */
+/* Modern, clean design with purple/blue accent colors */
+
+:root {
+  /* Nova Brand Colors */
+  --nova-primary: #6366f1;        /* Indigo - Primary brand color */
+  --nova-primary-dark: #4f46e5;   /* Darker indigo for hover states */
+  --nova-primary-light: #818cf8;  /* Lighter indigo */
+  --nova-secondary: #8b5cf6;      /* Purple accent */
+  --nova-success: #10b981;        /* Green for success states */
+  --nova-warning: #f59e0b;        /* Amber for warnings */
+  --nova-error: #ef4444;          /* Red for errors */
+  --nova-info: #3b82f6;           /* Blue for info */
+  
+  /* Neutrals */
+  --nova-gray-50: #f9fafb;
+  --nova-gray-100: #f3f4f6;
+  --nova-gray-200: #e5e7eb;
+  --nova-gray-300: #d1d5db;
+  --nova-gray-400: #9ca3af;
+  --nova-gray-500: #6b7280;
+  --nova-gray-600: #4b5563;
+  --nova-gray-700: #374151;
+  --nova-gray-800: #1f2937;
+  --nova-gray-900: #111827;
+  
+  /* Spacing */
+  --nova-radius: 12px;
+  --nova-radius-sm: 8px;
+  --nova-radius-lg: 16px;
+  
+  /* Shadows */
+  --nova-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --nova-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --nova-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --nova-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Global Overrides */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Nova Button Styles */
+.nova-btn {
+  @apply font-medium transition-all duration-200 inline-flex items-center justify-center;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+  border-radius: var(--nova-radius-sm);
+}
+
+.nova-btn-primary {
+  @apply text-white;
+  background: linear-gradient(135deg, var(--nova-primary) 0%, var(--nova-secondary) 100%);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.nova-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--nova-primary-dark) 0%, #7c3aed 100%);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+.nova-btn-secondary {
+  @apply bg-white text-gray-700 border-2;
+  border-color: var(--nova-gray-300);
+}
+
+.nova-btn-secondary:hover:not(:disabled) {
+  border-color: var(--nova-primary);
+  color: var(--nova-primary);
+}
+
+/* Nova Card Styles */
+.nova-card {
+  @apply bg-white border;
+  border-color: var(--nova-gray-200);
+  border-radius: var(--nova-radius);
+  box-shadow: var(--nova-shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.nova-card:hover {
+  box-shadow: var(--nova-shadow-md);
+}
+
+.nova-card-header {
+  @apply flex items-center justify-between px-6 py-4 border-b;
+  border-color: var(--nova-gray-100);
+  background: var(--nova-gray-50);
+  border-radius: var(--nova-radius) var(--nova-radius) 0 0;
+}
+
+/* Nova Badge Styles */
+.nova-badge {
+  @apply inline-flex items-center px-3 py-1 text-xs font-semibold;
+  border-radius: var(--nova-radius-sm);
+}
+
+.nova-badge-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  @apply text-white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.nova-badge-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  @apply text-white;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.nova-badge-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  @apply text-white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.nova-badge-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  @apply text-white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.nova-badge-neutral {
+  @apply bg-gray-100 text-gray-700;
+}
+
+/* Nova Input Styles */
+.nova-input {
+  @apply w-full px-4 py-2.5 border text-gray-900;
+  border-color: var(--nova-gray-300);
+  border-radius: var(--nova-radius-sm);
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.nova-input:focus {
+  outline: none;
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.nova-input:disabled {
+  @apply bg-gray-50 cursor-not-allowed;
+  opacity: 0.6;
+}
+
+/* Nova Tab Styles */
+.nova-tab {
+  @apply px-4 py-2.5 text-sm font-medium transition-all duration-200;
+  border-radius: var(--nova-radius-sm);
+  border: 2px solid transparent;
+}
+
+.nova-tab-active {
+  background: linear-gradient(135deg, var(--nova-primary) 0%, var(--nova-secondary) 100%);
+  @apply text-white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.nova-tab-inactive {
+  @apply bg-white text-gray-600 border-gray-200;
+}
+
+.nova-tab-inactive:hover {
+  @apply bg-gray-50 border-gray-300 text-gray-900;
+}
+
+/* Nova Table Styles */
+.nova-table {
+  @apply min-w-full;
+}
+
+.nova-table thead {
+  background: linear-gradient(180deg, var(--nova-gray-50) 0%, white 100%);
+}
+
+.nova-table th {
+  @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider;
+  color: var(--nova-gray-700);
+}
+
+.nova-table tbody tr {
+  @apply border-b;
+  border-color: var(--nova-gray-100);
+  transition: background-color 0.15s ease;
+}
+
+.nova-table tbody tr:hover {
+  background-color: var(--nova-gray-50);
+}
+
+.nova-table td {
+  @apply px-4 py-3 text-sm;
+  color: var(--nova-gray-900);
+}
+
+/* Nova Header Gradient */
+.nova-header {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  @apply text-white;
+  padding: 2rem;
+  border-radius: var(--nova-radius);
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+}
+
+/* Nova Alert Styles */
+.nova-alert {
+  @apply rounded-lg p-4 border;
+  border-radius: var(--nova-radius-sm);
+}
+
+.nova-alert-success {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: var(--nova-success);
+  @apply text-green-900;
+}
+
+.nova-alert-error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: var(--nova-error);
+  @apply text-red-900;
+}
+
+.nova-alert-warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: var(--nova-warning);
+  @apply text-amber-900;
+}
+
+.nova-alert-info {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: var(--nova-info);
+  @apply text-blue-900;
+}
+
+/* Nova Toggle/Checkbox Styles */
+.nova-checkbox {
+  @apply h-5 w-5 rounded border-gray-300;
+  accent-color: var(--nova-primary);
+  cursor: pointer;
+}
+
+.nova-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Nova Loading Spinner */
+.nova-spinner {
+  border: 3px solid rgba(99, 102, 241, 0.1);
+  border-left-color: var(--nova-primary);
+  @apply rounded-full animate-spin;
+}
+
+/* Smooth Animations */
+@keyframes nova-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nova-fade-in {
+  animation: nova-fade-in 0.3s ease-out;
+}
+
+/* Nova Gradient Background */
+.nova-bg-gradient {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  min-height: 100vh;
+}
+
+/* Nova Select Dropdown */
+.nova-select {
+  @apply px-4 py-2.5 border text-gray-900 pr-10;
+  border-color: var(--nova-gray-300);
+  border-radius: var(--nova-radius-sm);
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.75rem center/1.25rem 1.25rem;
+  appearance: none;
+  transition: all 0.2s ease;
+}
+
+.nova-select:focus {
+  outline: none;
+  border-color: var(--nova-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Status Indicators */
+.nova-status-dot {
+  @apply inline-block w-2 h-2 rounded-full mr-2;
+}
+
+.nova-status-active {
+  background: var(--nova-success);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.nova-status-inactive {
+  background: var(--nova-gray-400);
+}
+
+/* Nova Dashboard Stats Card */
+.nova-stat-card {
+  @apply p-6 rounded-lg bg-white border;
+  border-color: var(--nova-gray-200);
+  box-shadow: var(--nova-shadow);
+  transition: all 0.2s ease;
+}
+
+.nova-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--nova-shadow-lg);
+}
+
+.nova-stat-value {
+  @apply text-3xl font-bold;
+  background: linear-gradient(135deg, var(--nova-primary) 0%, var(--nova-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
