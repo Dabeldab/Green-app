@@ -41,29 +41,8 @@ async function initDb() {
   }
 }
 
-// Authentication middleware
-const authenticate = (req, res, next) => {
-  const accountName = req.headers['x-account-name'];
-  const accountKey = req.headers['x-account-key'];
-  
-  // TODO: Implement your actual authentication logic
-  // This could be:
-  // - Validate against Azure AD
-  // - Check against Salesforce credentials
-  // - Validate API keys from database
-  // - Verify JWT tokens
-  
-  if (!accountName || !accountKey) {
-    return res.status(401).json({ 
-      error: 'Authentication required',
-      message: 'Please provide account name and key' 
-    });
-  }
-  
-  // For now, just store credentials in request
-  req.credentials = { accountName, accountKey };
-  next();
-};
+// No authentication middleware needed for now
+// Will be replaced with Salesforce authentication later
 
 // Error handler middleware
 const errorHandler = (err, req, res, next) => {
@@ -75,36 +54,10 @@ const errorHandler = (err, req, res, next) => {
 };
 
 // ============================================
-// AUTHENTICATION ENDPOINTS
-// ============================================
-
-app.post('/api/auth/login', async (req, res, next) => {
-  try {
-    const { accountName, accountKey } = req.body;
-    
-    // TODO: Implement actual authentication
-    // Example: Validate against database, Azure AD, or Salesforce
-    
-    res.json({
-      success: true,
-      message: 'Authentication successful',
-      // Optionally return a JWT token:
-      // token: generateJWT({ accountName })
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.post('/api/auth/verify', authenticate, (req, res) => {
-  res.json({ valid: true });
-});
-
-// ============================================
 // PRODUCTS ENDPOINTS
 // ============================================
 
-app.get('/api/products', authenticate, async (req, res, next) => {
+app.get('/api/products', async (req, res, next) => {
   try {
     const { sku, productId } = req.query;
     
@@ -128,7 +81,7 @@ app.get('/api/products', authenticate, async (req, res, next) => {
   }
 });
 
-app.post('/api/products/validate', authenticate, async (req, res, next) => {
+app.post('/api/products/validate', async (req, res, next) => {
   try {
     const { rows } = req.body;
     const issues = [];
@@ -142,7 +95,7 @@ app.post('/api/products/validate', authenticate, async (req, res, next) => {
   }
 });
 
-app.post('/api/products/bulk', authenticate, async (req, res, next) => {
+app.post('/api/products/bulk', async (req, res, next) => {
   const transaction = new sql.Transaction(pool);
   
   try {
@@ -230,7 +183,7 @@ app.post('/api/products/bulk', authenticate, async (req, res, next) => {
 // INVENTORY ENDPOINTS
 // ============================================
 
-app.get('/api/inventory', authenticate, async (req, res, next) => {
+app.get('/api/inventory', async (req, res, next) => {
   try {
     const { locationId, productId } = req.query;
     
@@ -255,7 +208,7 @@ app.get('/api/inventory', authenticate, async (req, res, next) => {
   }
 });
 
-app.post('/api/inventory/bulk', authenticate, async (req, res, next) => {
+app.post('/api/inventory/bulk', async (req, res, next) => {
   const transaction = new sql.Transaction(pool);
   
   try {
@@ -379,7 +332,7 @@ app.post('/api/inventory/bulk', authenticate, async (req, res, next) => {
 // AUDIT/TRANSACTIONS ENDPOINTS
 // ============================================
 
-app.get('/api/transactions', authenticate, async (req, res, next) => {
+app.get('/api/transactions', async (req, res, next) => {
   try {
     const { productId, limit = 50 } = req.query;
     
@@ -404,7 +357,7 @@ app.get('/api/transactions', authenticate, async (req, res, next) => {
   }
 });
 
-app.get('/api/audit', authenticate, async (req, res, next) => {
+app.get('/api/audit', async (req, res, next) => {
   try {
     // Implement audit log retrieval
     // This might come from a custom audit table you create

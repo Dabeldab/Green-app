@@ -5,53 +5,15 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000
 
 class ApiService {
   constructor() {
-    this.token = null;
-    this.accountName = null;
+    // No authentication needed for now
   }
 
   /**
-   * Set authentication credentials
-   * Call this after user logs in or on app startup
-   */
-  setCredentials(accountName, accountKey) {
-    this.accountName = accountName;
-    // Store securely - consider using sessionStorage instead of memory
-    sessionStorage.setItem('accountName', accountName);
-    sessionStorage.setItem('accountKey', accountKey);
-  }
-
-  /**
-   * Get stored credentials
-   */
-  getCredentials() {
-    return {
-      accountName: sessionStorage.getItem('accountName'),
-      accountKey: sessionStorage.getItem('accountKey')
-    };
-  }
-
-  /**
-   * Clear credentials on logout
-   */
-  clearCredentials() {
-    this.accountName = null;
-    this.token = null;
-    sessionStorage.removeItem('accountName');
-    sessionStorage.removeItem('accountKey');
-  }
-
-  /**
-   * Get authentication headers
+   * Get headers for API requests
    */
   getHeaders() {
-    const { accountName, accountKey } = this.getCredentials();
     return {
-      'Content-Type': 'application/json',
-      // Adjust these header names based on what you discover in your investigation
-      'X-Account-Name': accountName || '',
-      'X-Account-Key': accountKey || '',
-      // Or if using Bearer token:
-      // 'Authorization': `Bearer ${this.token}`
+      'Content-Type': 'application/json'
     };
   }
 
@@ -222,44 +184,6 @@ class ApiService {
     });
   }
 
-  // ============================================
-  // AUTHENTICATION (if needed)
-  // ============================================
-
-  /**
-   * Login with account credentials
-   */
-  async login(accountName, accountKey) {
-    const response = await this.request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ accountName, accountKey })
-    });
-    
-    if (response.token) {
-      this.token = response.token;
-      this.setCredentials(accountName, accountKey);
-    }
-    
-    return response;
-  }
-
-  /**
-   * Verify current session is valid
-   */
-  async verifyAuth() {
-    return this.request('/auth/verify');
-  }
-
-  /**
-   * Logout
-   */
-  async logout() {
-    try {
-      await this.request('/auth/logout', { method: 'POST' });
-    } finally {
-      this.clearCredentials();
-    }
-  }
 }
 
 // Export singleton instance
